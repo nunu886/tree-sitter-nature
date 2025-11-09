@@ -8,3 +8,5 @@ test2.txt
 src/grammar.json
 src/parser.c
 src/node-types.json
+build/
+nature.so

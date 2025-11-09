@@ -1,23 +1,32 @@
-lockfileVersion: 5.4
+lockfileVersion: '9.0'
 
-specifiers:
-  nan: ^2.17.0
-  tree-sitter-cli: ^0.20.8
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
-dependencies:
-  nan: 2.17.0
+importers:
 
-devDependencies:
-  tree-sitter-cli: 0.20.8
+  .:
+    dependencies:
+      nan:
+        specifier: ^2.17.0
+        version: 2.23.1
+      tree-sitter-cli:
+        specifier: ^0.25.10
+        version: 0.25.10
 
 packages:
 
-  /nan/2.17.0:
-    resolution: {integrity: sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==}
-    dev: false
+  nan@2.23.1:
+    resolution: {integrity: sha512-r7bBUGKzlqk8oPBDYxt6Z0aEdF1G1rwlMcLk8LCOMbOzf0mG+JUfUzG4fIMWwHWP0iyaLWEQZJmtB7nOHEm/qw==}
 
-  /tree-sitter-cli/0.20.8:
-    resolution: {integrity: sha512-XjTcS3wdTy/2cc/ptMLc/WRyOLECRYcMTrSWyhZnj1oGSOWbHLTklgsgRICU3cPfb0vy+oZCC33M43u6R1HSCA==}
+  tree-sitter-cli@0.25.10:
+    resolution: {integrity: sha512-KoebQguKMCIghisEOdA372TIbrUl0kdnfZ9YQIBRAeOvNSKe85XbU4LuFW7hduRUwJj0rAG7pX5wo9sZhbBF1g==}
+    engines: {node: '>=12.0.0'}
     hasBin: true
-    requiresBuild: true
-    dev: true
+
+snapshots:
+
+  nan@2.23.1: {}
+
+  tree-sitter-cli@0.25.10: {}

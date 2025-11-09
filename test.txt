@@ -18,3 +18,12 @@ type S = struct {
     return s.a + s.b + c
   }
 }
+
+fn main() {
+  var a = 2
+  if(a<2){
+    char a = 'a'
+  } else {
+
+  }
+}

@@ -4,6 +4,7 @@ string?|int|null|i8 a = f
 const a = f
 type MyType = string?|int|null|i8
 const b = 123
+const b = 1.2
 const str = "Hello"
 const c = 'a'
 int? a = null
@@ -11,3 +12,16 @@ const a = true
 const b = false
 const arr = [1, 2, 3]
 const arr2 = ["a", "b"]
+
+/* Comment
+*
+*
+/
+// comment a
+
+//type decl
+type S = struct {
+    string field1
+    int field2
+}
+(int, string) a = (1, "a")

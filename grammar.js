@@ -166,12 +166,12 @@ const PREC = {
 // int_literal ::= ... /* Integer literal */
 // label_token ::= ... /* Label macro, e.g. @linkid */
 // macro_expr ::= ... /* Macro calls */
-// builtin_type ::= "int" | "float" | "bool" | "string" | "void" | "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" | "f32" | "f64" | ... /* etc */
+// builtin_type ::= "int" |属性包含一组可能出现在语言中任何地方的标记（token）。通常用于空格和注释。extras的默认值包含空格。如果要手动处理空格，请将extras: $ => []加入你的配置。 "float" | "bool" | "string" | "void" | "i8" | "i16" | "i32" | "i64" | "u8" | "u16" | "u32" | "u64" | "f32" | "f64" | ... /* etc */
 
 //https://github.com/tree-sitter/tree-sitter-go/blob/master/grammar.js
 module.exports = grammar({
   name: "nature",
-  extras: ($) => [/\s/],
+  extras: ($) => [/\s/, $.comment],
   // externals: $ => [],
   conflicts: ($) => [
     //   [$.expression, $.baseType],
@@ -211,6 +211,8 @@ module.exports = grammar({
     ],
   },
 
+  supertypes: ($) => [$.type, /*$.statements*/ $.expression, $.numberLiteral],
+
   rules: {
     source_file: ($) => repeat($.statements),
     statements: ($) =>
@@ -239,7 +241,7 @@ module.exports = grammar({
     //   ),
     varDecl: ($) =>
       seq(
-        choice("var", $.type),
+        choice("var", $.type, $.tupleType),
         field("name", $.identifier),
         seq("=", choice($.expression)),
       ),
@@ -250,7 +252,7 @@ module.exports = grammar({
         "type",
         field("type_name", $.identifier),
         "=",
-        field("type_value", $.type),
+        field("type_value", choice($.type, $.structDecl)),
       ),
     // exprStmt: $ => seq($.expression, ';'),
     // ifStmt: ($) =>
@@ -283,7 +285,7 @@ module.exports = grammar({
         // $.callExpr,
         // $.unaryExpr,
         // $.binaryExpr,
-        // $.tupleExpr,
+        $.tupleExpr,
         // $.selectorExpr,
         $.arrayLiteral,
         $.boolLiteral,
@@ -357,12 +359,8 @@ module.exports = grammar({
     //     ),
     //   ),
     // groupExpr: ($) => seq("(", $.expression, ")"),
-    // tupleExpr: ($) =>
-    //   seq(
-    //     "(",
-    //     repeat1(seq(choice($.expression, $.arrayLiteral), optional(","))),
-    //     ")",
-    //   ),
+    tupleExpr: ($) =>
+      seq("(", $.expression, repeat(seq(",", $.expression)), ")"),
     // argumentsList: ($) => seq($.expression, optional(",")),
     // parameterList: ($) => repeat1($.parameterDecl),
     // parameterDecl: ($) =>
@@ -374,7 +372,7 @@ module.exports = grammar({
     //     optional(","),
     //   ),
 
-    type: ($) => choice($.singleType, $.optionType, $.unionType),
+    type: ($) => choice($.baseType, $.optionType, $.unionType),
     baseType: ($) =>
       choice(
         "i8",
@@ -401,22 +399,15 @@ module.exports = grammar({
         "self",
         "any",
       ),
-    singleType: ($) => choice($.baseType),
     optionType: ($) => seq($.baseType, "?"),
-    // structDecl: ($) =>
-    //   seq(
-    //     "struct",
-    //     "{",
-    //     seq(optional($.fieldDeclList), optional($.methodDeclList)),
-    //     "}",
-    //   ),
-    // fieldDeclList: ($) => repeat1($.filedDecl),
-    // filedDecl: ($) =>
-    //   seq(
-    //     field("type", $.type),
-    //     field("name", $.identifier),
-    //     optional(seq("=", $.expression)),
-    //   ),
+    structDecl: ($) => seq("struct", "{", seq(optional($.fieldDeclList)), "}"),
+    fieldDeclList: ($) => repeat1($.filedDecl),
+    filedDecl: ($) =>
+      seq(
+        field("field_type", $.type),
+        field("field_name", $.identifier),
+        optional(seq("=", $.expression)),
+      ),
     // methodDeclList: ($) => repeat1($.methodDecl),
     // methodDecl: ($) =>
     //   seq(
@@ -437,20 +428,16 @@ module.exports = grammar({
     //     PREC.lowest,
     //     seq("[", $.baseType, optional(seq(",", $.intLiteral)), "]"),
     //   ),
-    // tupleType: ($) =>
-    //   prec.left(
-    //     PREC.lowest,
-    //     seq("(", repeat1(seq($.baseType, optional(","))), ")"),
-    //   ),
+    tupleType: ($) => seq("(", $.type, repeat(seq(optional(","), $.type)), ")"),
     unionType: ($) =>
       seq(
-        choice($.singleType, $.optionType),
-        repeat1(seq("|", choice($.singleType, $.optionType))),
+        choice($.baseType, $.optionType),
+        repeat1(seq("|", choice($.baseType, $.optionType))),
       ), //i8?|u8|null foo = null
     numberLiteral: ($) => choice($.intLiteral, $.floatLiteral),
     intLiteral: ($) => /(\d\d*|0[0-7]*|0[xX][\da-fA-F]*)/,
     floatLiteral: ($) =>
-      choice(/\d\.\d*([eE][+-]\d*)?/, /\d*[eE][+-]\d*/, /\.\d*[eE][+-]\d*/),
+      choice(/\d\.\d*([eE][+-]\d*)?/, /\d*[eE][+-]\d*/, /\d*\.\d*/),
     boolLiteral: ($) => /(true|false)/,
     stringLiteral: ($) => choice(seq('"', /\w+/, '"'), seq("`", /\w+/, "`")),
     charLiteral: ($) => seq("'", /\w/, "'"),
@@ -458,7 +445,7 @@ module.exports = grammar({
       seq("[", repeat1(seq($.expression, optional(","))), "]"),
     identifier: ($) => /[_a-zA-Z_]\w*/,
     comment: (_) =>
-      choice(seq("//"), seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/")),
+      choice(seq(seq("//", /.*/)), seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/")),
     _null: (_) => token("null"),
   },
 });

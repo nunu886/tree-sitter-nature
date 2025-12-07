@@ -6,9 +6,10 @@
       "camelcase": "Nature",
       "title": "Nature",
       "scope": "source.nature",
-      "file-types": ["nature"],
+      "file-types": ["n"],
       "injection-regex": "^nature$",
-      "class-name": "TreeSitterNature"
+      "class-name": "TreeSitterNature",
+      "highlights": "queries/highlights.scm"
     }
   ],
   "metadata": {

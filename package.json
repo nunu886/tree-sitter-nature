@@ -5,8 +5,9 @@
   "main": "bindings/node",
   "scripts": {
     "test": "tree-sitter generate && tree-sitter parse test.txt",
-    "build": "tree-sitter build",
-    "play": "tree-sitter build --wasm && tree-sitter playground"
+    "build-wasm": "tree-sitter build --wasm",
+    "build-so": "tree-sitter build",
+    "play": "pnpm run build-wasm && tree-sitter playground"
   },
   "keywords": [
     "tree-sitter",

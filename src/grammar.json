@@ -40,6 +40,10 @@
             {
               "type": "SYMBOL",
               "name": "type"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "tupleType"
             }
           ]
         },
@@ -129,8 +133,17 @@
           "type": "FIELD",
           "name": "type_value",
           "content": {
-            "type": "SYMBOL",
-            "name": "type"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "type"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "structDecl"
+              }
+            ]
           }
         }
       ]
@@ -141,6 +154,10 @@
         {
           "type": "SYMBOL",
           "name": "identifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "tupleExpr"
         },
         {
           "type": "SYMBOL",
@@ -168,12 +185,45 @@
         }
       ]
     },
+    "tupleExpr": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "expression"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": ","
+              },
+              {
+                "type": "SYMBOL",
+                "name": "expression"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
     "type": {
       "type": "CHOICE",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "singleType"
+          "name": "baseType"
         },
         {
           "type": "SYMBOL",
@@ -278,15 +328,6 @@
         }
       ]
     },
-    "singleType": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "baseType"
-        }
-      ]
-    },
     "optionType": {
       "type": "SEQ",
       "members": [
@@ -300,6 +341,130 @@
         }
       ]
     },
+    "structDecl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "struct"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "fieldDeclList"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "fieldDeclList": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "SYMBOL",
+        "name": "filedDecl"
+      }
+    },
+    "filedDecl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "field_type",
+          "content": {
+            "type": "SYMBOL",
+            "name": "type"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "field_name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "="
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "expression"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "tupleType": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": ","
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              },
+              {
+                "type": "SYMBOL",
+                "name": "type"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
     "unionType": {
       "type": "SEQ",
       "members": [
@@ -308,7 +473,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "singleType"
+              "name": "baseType"
             },
             {
               "type": "SYMBOL",
@@ -330,7 +495,7 @@
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "singleType"
+                    "name": "baseType"
                   },
                   {
                     "type": "SYMBOL",
@@ -373,7 +538,7 @@
         },
         {
           "type": "PATTERN",
-          "value": "\\.\\d*[eE][+-]\\d*"
+          "value": "\\d*\\.\\d*"
         }
       ]
     },
@@ -485,8 +650,17 @@
           "type": "SEQ",
           "members": [
             {
-              "type": "STRING",
-              "value": "//"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "//"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": ".*"
+                }
+              ]
             }
           ]
         },
@@ -521,13 +695,21 @@
     {
       "type": "PATTERN",
       "value": "\\s"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "comment"
     }
   ],
   "conflicts": [],
   "precedences": [],
   "externals": [],
   "inline": [],
-  "supertypes": [],
+  "supertypes": [
+    "type",
+    "expression",
+    "numberLiteral"
+  ],
   "reserved": {
     "global": [
       {

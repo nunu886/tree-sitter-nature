@@ -1,29 +1,13 @@
-foo = fn((1,([1,2,3], true)), foo())
-i32 bar = (1 + 2) * 3
-(int, bool) f = (1, true)
-foo((1,([1,2,3], true)), foo())
-var a = fn(int i):i16 {}
-foo()
-fn foo(A a, int b):i32 {
-  return 1
-}
-type T = (bool, i32)
-var a = foo()
-type T = gen i8|u8|null|A
-type Option_a = i32|T
-type S = struct {
-  int a
-  int b
-  var a = fn(self s, int c):int{
-    return s.a + s.b + c
-  }
-}
-
-fn main() {
-  var a = 2
-  if(a<2){
-    char a = 'a'
-  } else {
-
-  }
-}
+var a_123 = f
+string? a = f
+string?|int|null|i8 a = f
+const a = f
+type MyType = string?|int|null|i8
+const b = 123
+const str = "Hello"
+const c = 'a'
+int? a = null
+const a = true
+const b = false
+const arr = [1, 2, 3]
+const arr2 = ["a", "b"]

@@ -174,8 +174,8 @@ module.exports = grammar({
   extras: ($) => [/\s/, $.comment],
   // externals: $ => [],
   conflicts: ($) => [
-    //   [$.expression, $.baseType],
-    //   [$.fnCallStmt, $.expression],
+    [$.expression, $.baseType],
+    //   [$.forClause, $.expression],
   ],
   // inline: ($) => [$.type],
   word: ($) => $.identifier,
@@ -183,10 +183,10 @@ module.exports = grammar({
     global: ($) => [
       // "fn",
       // "self",
-      // 'for',
-      // 'while',
-      // "if",
-      // "else",
+      "for",
+      // 'while', no this keyword
+      "if",
+      "else",
       // "return",
       // "continue",
       // "break",
@@ -197,7 +197,7 @@ module.exports = grammar({
       // 'try',
       // 'is',
       // 'as',
-      // 'in',
+      "in",
       // "null",
       "type",
       // "struct",
@@ -211,7 +211,7 @@ module.exports = grammar({
     ],
   },
 
-  supertypes: ($) => [$.type, /*$.statements*/ $.expression, $.numberLiteral],
+  supertypes: ($) => [$.type, $.expression /*$.statements*/],
 
   rules: {
     source_file: ($) => repeat($.statements),
@@ -221,13 +221,14 @@ module.exports = grammar({
         // $.assignmentStmt,
         // $.continueStmt,
         // $.breakStmt,
-        // $.blockStmt,
+        $.blockStmt,
         // $.returnStmt,
         $.varDecl,
         $.constDecl,
         $.typeDecl,
         // $.fnCallStmt,
-        // $.ifStmt,
+        $.ifStmt,
+        $.forStmt,
       ),
     // funDecl: ($) =>
     //   seq(
@@ -241,7 +242,7 @@ module.exports = grammar({
     //   ),
     varDecl: ($) =>
       seq(
-        choice("var", $.type, $.tupleType),
+        choice("var", field("type", $.type)),
         field("name", $.identifier),
         seq("=", choice($.expression)),
       ),
@@ -255,18 +256,39 @@ module.exports = grammar({
         field("type_value", choice($.type, $.structDecl)),
       ),
     // exprStmt: $ => seq($.expression, ';'),
-    // ifStmt: ($) =>
-    //   seq(
-    //     "if",
-    //     "(",
-    //     $.expression,
-    //     ")",
-    //     $.blockStmt,
-    //     optional(seq("else", $.statements)),
-    //   ),
-    // forStmt: $ => seq('for', '(', choice($.varDecl, $.exprStmt, ';'), optional($.expression), ';', optional($.expression), ')', $.statements),
+    ifStmt: ($) =>
+      seq(
+        "if",
+        field("condition", $.expression),
+        field("consequence", $.blockStmt),
+        optional(
+          seq("else", field("alternative", choice($.blockStmt, $.ifStmt))),
+        ),
+      ),
+
+    // for i <= 100 {}
+    //
+    // for int i = 1; i <= 100; i += 1 {}
+    forStmt: ($) =>
+      seq(
+        "for",
+        choice($.forClause, $.expression, $.rangeClause),
+        field("body", $.blockStmt),
+      ),
+    forClause: ($) =>
+      seq(
+        field("initializer", optional($.statements)),
+        ";",
+        field("condition", optional($.expression)),
+        ";",
+        field("update", optional($.expression)),
+      ),
+    //for k in map {}
+    rangeClause: ($) =>
+      seq(field("left", $.identifier), "in", field("right", $.expression)),
+    // not this statement
     // whileStmt: $ => seq('while', '(', $.expression, ')', $.statements),
-    // blockStmt: ($) => seq("{", optional($.statements), "}"),
+    blockStmt: ($) => seq("{", optional($.statements), "}"),
     // returnStmt: ($) =>
     //   prec.right(PREC.lowest, seq("return", optional($.expression))),
     // breakStmt: (_) => seq("break"),
@@ -282,7 +304,7 @@ module.exports = grammar({
       choice(
         $.identifier,
         // $.indexExpr,
-        // $.callExpr,
+        $.callExpr,
         // $.unaryExpr,
         // $.binaryExpr,
         $.tupleExpr,
@@ -348,20 +370,23 @@ module.exports = grammar({
     //       seq(".", field("field", $.expression)),
     //     ),
     //   ),
-    // callExpr: ($) =>
-    //   prec.left(
-    //     PREC.call,
-    //     seq(
-    //       field("function", $.identifier),
-    //       "(",
-    //       field("arguments", repeat($.argumentsList)),
-    //       ")",
-    //     ),
-    //   ),
+    callExpr: ($) =>
+      prec.left(
+        PREC.call,
+        seq(
+          field("function_call", $.expression),
+          field("arguments", $.argumentsList),
+        ),
+      ),
     // groupExpr: ($) => seq("(", $.expression, ")"),
     tupleExpr: ($) =>
       seq("(", $.expression, repeat(seq(",", $.expression)), ")"),
-    // argumentsList: ($) => seq($.expression, optional(",")),
+    argumentsList: ($) =>
+      seq(
+        "(",
+        optional(seq($.expression, repeat(seq(",", $.expression)))),
+        ")",
+      ),
     // parameterList: ($) => repeat1($.parameterDecl),
     // parameterDecl: ($) =>
     //   seq(
@@ -372,7 +397,14 @@ module.exports = grammar({
     //     optional(","),
     //   ),
 
-    type: ($) => choice($.baseType, $.optionType, $.unionType),
+    type: ($) =>
+      choice(
+        $.baseType,
+        $.optionType,
+        $.unionType,
+        $.vecArrayType,
+        $.tupleType,
+      ),
     baseType: ($) =>
       choice(
         "i8",
@@ -434,6 +466,7 @@ module.exports = grammar({
         choice($.baseType, $.optionType),
         repeat1(seq("|", choice($.baseType, $.optionType))),
       ), //i8?|u8|null foo = null
+    vecArrayType: ($) => seq("[", $.baseType, "]"),
     numberLiteral: ($) => choice($.intLiteral, $.floatLiteral),
     intLiteral: ($) => /(\d\d*|0[0-7]*|0[xX][\da-fA-F]*)/,
     floatLiteral: ($) =>

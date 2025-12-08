@@ -25,3 +25,31 @@ type S = struct {
     int field2
 }
 (int, string) a = (1, "a")
+
+//function call
+const call = f()
+const call2 = f(1, "a")
+const call3 = f(1, "a", (1,2))
+const call4 = f((1, f()))
+
+// if statement
+if a {
+    var a = 1
+} else if 1 {
+    var a = 2
+} else {
+    const a = f()
+}
+
+// [int] a = [1,2,3]
+[int] a = [1,2,3]
+[int] b = [1,2,3]
+
+// for statement
+for 1 {
+
+}
+for var a = 1; 1; 1 {
+}
+for k in map {
+}

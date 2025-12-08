@@ -12,6 +12,10 @@
         "named": true
       },
       {
+        "type": "callExpr",
+        "named": true
+      },
+      {
         "type": "charLiteral",
         "named": true
       },
@@ -38,20 +42,6 @@
     ]
   },
   {
-    "type": "numberLiteral",
-    "named": true,
-    "subtypes": [
-      {
-        "type": "floatLiteral",
-        "named": true
-      },
-      {
-        "type": "intLiteral",
-        "named": true
-      }
-    ]
-  },
-  {
     "type": "type",
     "named": true,
     "subtypes": [
@@ -64,10 +54,33 @@
         "named": true
       },
       {
+        "type": "tupleType",
+        "named": true
+      },
+      {
         "type": "unionType",
+        "named": true
+      },
+      {
+        "type": "vecArrayType",
         "named": true
       }
     ]
+  },
+  {
+    "type": "argumentsList",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "arrayLiteral",
@@ -88,6 +101,47 @@
     "type": "baseType",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "blockStmt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "statements",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "callExpr",
+    "named": true,
+    "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argumentsList",
+            "named": true
+          }
+        ]
+      },
+      "function_call": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "charLiteral",
@@ -183,6 +237,135 @@
     "fields": {}
   },
   {
+    "type": "forClause",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "initializer": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statements",
+            "named": true
+          }
+        ]
+      },
+      "update": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "forStmt",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "blockStmt",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        },
+        {
+          "type": "forClause",
+          "named": true
+        },
+        {
+          "type": "rangeClause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "ifStmt",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "blockStmt",
+            "named": true
+          },
+          {
+            "type": "ifStmt",
+            "named": true
+          }
+        ]
+      },
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "consequence": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "blockStmt",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "numberLiteral",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "floatLiteral",
+          "named": true
+        },
+        {
+          "type": "intLiteral",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "optionType",
     "named": true,
     "fields": {},
@@ -195,6 +378,32 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "rangeClause",
+    "named": true,
+    "fields": {
+      "left": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "right": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -222,7 +431,19 @@
       "required": true,
       "types": [
         {
+          "type": "blockStmt",
+          "named": true
+        },
+        {
           "type": "constDecl",
+          "named": true
+        },
+        {
+          "type": "forStmt",
+          "named": true
+        },
+        {
+          "type": "ifStmt",
           "named": true
         },
         {
@@ -348,22 +569,39 @@
             "named": true
           }
         ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
           "type": "expression",
           "named": true
-        },
+        }
+      ]
+    }
+  },
+  {
+    "type": "vecArrayType",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
         {
-          "type": "tupleType",
-          "named": true
-        },
-        {
-          "type": "type",
+          "type": "baseType",
           "named": true
         }
       ]
@@ -399,6 +637,10 @@
   },
   {
     "type": "//",
+    "named": false
+  },
+  {
+    "type": ";",
     "named": false
   },
   {
@@ -442,6 +684,10 @@
     "named": false
   },
   {
+    "type": "else",
+    "named": false
+  },
+  {
     "type": "f32",
     "named": false
   },
@@ -451,6 +697,10 @@
   },
   {
     "type": "float",
+    "named": false
+  },
+  {
+    "type": "for",
     "named": false
   },
   {
@@ -472,6 +722,14 @@
   {
     "type": "identifier",
     "named": true
+  },
+  {
+    "type": "if",
+    "named": false
+  },
+  {
+    "type": "in",
+    "named": false
   },
   {
     "type": "int",

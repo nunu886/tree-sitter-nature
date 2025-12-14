@@ -5,11 +5,10 @@
       "name": "nature",
       "camelcase": "Nature",
       "title": "Nature",
-      "scope": "source.nature",
+      "scope": "source.n",
       "file-types": ["n"],
-      "injection-regex": "^nature$",
-      "class-name": "TreeSitterNature",
-      "highlights": "queries/highlights.scm"
+      "injection-regex": "^n$",
+      "class-name": "TreeSitterNature"
     }
   ],
   "metadata": {

@@ -175,6 +175,7 @@ module.exports = grammar({
   // externals: $ => [],
   conflicts: ($) => [
     [$.expression, $.baseType],
+    [$.expression, $.genericType],
     //   [$.forClause, $.expression],
   ],
   // inline: ($) => [$.type],
@@ -217,34 +218,51 @@ module.exports = grammar({
     source_file: ($) => repeat($.statements),
     statements: ($) =>
       choice(
-        // $.funDecl,
+        $.funDecl,
         // $.assignmentStmt,
         // $.continueStmt,
         // $.breakStmt,
         $.blockStmt,
         // $.returnStmt,
         $.varDecl,
+        $.tupleDestructuringDecl,
         $.constDecl,
         $.typeDecl,
-        // $.fnCallStmt,
+        $.fnCallStmt,
         $.ifStmt,
         $.forStmt,
       ),
-    // funDecl: ($) =>
-    //   seq(
-    //     "fn",
-    //     optional(field("name", $.identifier)),
-    //     "(",
-    //     optional($.parameterList),
-    //     ")",
-    //     optional(field("result", seq(":", $.type))),
-    //     field("body", $.blockStmt),
-    //   ),
+    // fn function_name [<T>] (parameter_list):return_type {
+    //      function body
+    // }
+    funDecl: ($) =>
+      seq(
+        "fn",
+        optional(field("function_name", $.identifier)),
+        optional(field("generic_parameter_list", $.genericParameterList)),
+        "(",
+        optional($.parameterList),
+        ")",
+        optional(field("result_type", seq(":", $.type))),
+        field("function_body", $.blockStmt),
+      ),
     varDecl: ($) =>
       seq(
         choice("var", field("type", $.type)),
         field("name", $.identifier),
-        seq("=", choice($.expression)),
+        seq("=", choice($.expression, $.funDecl)),
+      ),
+    //tuple destructuring declaration
+    tupleDestructuringDecl: ($) =>
+      seq(
+        "var",
+        "(",
+        field(
+          "destructuring_name",
+          seq($.identifier, repeat(seq(",", $.identifier))),
+        ),
+        ")",
+        seq("=", $.expression),
       ),
     constDecl: ($) =>
       seq("const", field("name", $.identifier), seq("=", choice($.expression))),
@@ -293,7 +311,7 @@ module.exports = grammar({
     //   prec.right(PREC.lowest, seq("return", optional($.expression))),
     // breakStmt: (_) => seq("break"),
     // continueStmt: (_) => seq("continue"),
-    // fnCallStmt: ($) => $.callExpr,
+    fnCallStmt: ($) => $.expression,
     // assignmentStmt: ($) =>
     //   seq(
     //     choice(field("left", choice($.identifier, $.selectorExpr))),
@@ -374,7 +392,7 @@ module.exports = grammar({
       prec.left(
         PREC.call,
         seq(
-          field("function_call", $.expression),
+          field("function_call_name", $.expression),
           field("arguments", $.argumentsList),
         ),
       ),
@@ -387,15 +405,20 @@ module.exports = grammar({
         optional(seq($.expression, repeat(seq(",", $.expression)))),
         ")",
       ),
-    // parameterList: ($) => repeat1($.parameterDecl),
-    // parameterDecl: ($) =>
-    //   seq(
-    //     choice(
-    //       seq("self", field("self", $.identifier)),
-    //       seq(field("type", $.type), field("name", $.identifier)),
-    //     ),
-    //     optional(","),
-    //   ),
+    parameterList: ($) =>
+      seq(
+        field("parameter_type", $.type),
+        field("parameter_name", $.identifier),
+        repeat(
+          seq(
+            ",",
+            field("parameter_type", $.type),
+            field("parameter_name", $.identifier),
+          ),
+        ),
+      ),
+    genericParameterList: ($) =>
+      seq("<", $.identifier, repeat(seq(",", $.identifier)), ">"),
 
     type: ($) =>
       choice(
@@ -404,6 +427,7 @@ module.exports = grammar({
         $.unionType,
         $.vecArrayType,
         $.tupleType,
+        $.genericType, // this is <T>, T is Identifier
       ),
     baseType: ($) =>
       choice(
@@ -428,8 +452,6 @@ module.exports = grammar({
         "ptr",
         "anyptr",
         "rawptr",
-        "self",
-        "any",
       ),
     optionType: ($) => seq($.baseType, "?"),
     structDecl: ($) => seq("struct", "{", seq(optional($.fieldDeclList)), "}"),
@@ -467,6 +489,7 @@ module.exports = grammar({
         repeat1(seq("|", choice($.baseType, $.optionType))),
       ), //i8?|u8|null foo = null
     vecArrayType: ($) => seq("[", $.baseType, "]"),
+    genericType: ($) => seq($.identifier),
     numberLiteral: ($) => choice($.intLiteral, $.floatLiteral),
     intLiteral: ($) => /(\d\d*|0[0-7]*|0[xX][\da-fA-F]*)/,
     floatLiteral: ($) =>

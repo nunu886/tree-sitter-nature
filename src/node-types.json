@@ -50,6 +50,10 @@
         "named": true
       },
       {
+        "type": "genericType",
+        "named": true
+      },
+      {
         "type": "optionType",
         "named": true
       },
@@ -131,7 +135,7 @@
           }
         ]
       },
-      "function_call": {
+      "function_call_name": {
         "multiple": false,
         "required": true,
         "types": [
@@ -237,6 +241,21 @@
     "fields": {}
   },
   {
+    "type": "fnCallStmt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "forClause",
     "named": true,
     "fields": {
@@ -301,6 +320,96 @@
         },
         {
           "type": "rangeClause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "funDecl",
+    "named": true,
+    "fields": {
+      "function_body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "blockStmt",
+            "named": true
+          }
+        ]
+      },
+      "function_name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "generic_parameter_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "genericParameterList",
+            "named": true
+          }
+        ]
+      },
+      "result_type": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ":",
+            "named": false
+          },
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "parameterList",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "genericParameterList",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "genericType",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
           "named": true
         }
       ]
@@ -381,6 +490,32 @@
     }
   },
   {
+    "type": "parameterList",
+    "named": true,
+    "fields": {
+      "parameter_name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "parameter_type": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "rangeClause",
     "named": true,
     "fields": {
@@ -439,11 +574,23 @@
           "named": true
         },
         {
+          "type": "fnCallStmt",
+          "named": true
+        },
+        {
           "type": "forStmt",
           "named": true
         },
         {
+          "type": "funDecl",
+          "named": true
+        },
+        {
           "type": "ifStmt",
+          "named": true
+        },
+        {
+          "type": "tupleDestructuringDecl",
           "named": true
         },
         {
@@ -472,6 +619,36 @@
       "types": [
         {
           "type": "fieldDeclList",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "tupleDestructuringDecl",
+    "named": true,
+    "fields": {
+      "destructuring_name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
           "named": true
         }
       ]
@@ -588,6 +765,10 @@
         {
           "type": "expression",
           "named": true
+        },
+        {
+          "type": "funDecl",
+          "named": true
         }
       ]
     }
@@ -640,11 +821,23 @@
     "named": false
   },
   {
+    "type": ":",
+    "named": false
+  },
+  {
     "type": ";",
     "named": false
   },
   {
+    "type": "<",
+    "named": false
+  },
+  {
     "type": "=",
+    "named": false
+  },
+  {
+    "type": ">",
     "named": false
   },
   {
@@ -700,6 +893,10 @@
     "named": false
   },
   {
+    "type": "fn",
+    "named": false
+  },
+  {
     "type": "for",
     "named": false
   },
@@ -749,10 +946,6 @@
   },
   {
     "type": "rawptr",
-    "named": false
-  },
-  {
-    "type": "self",
     "named": false
   },
   {

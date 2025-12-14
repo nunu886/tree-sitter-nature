@@ -53,3 +53,39 @@ for var a = 1; 1; 1 {
 }
 for k in map {
 }
+
+//function decl
+fn f(int a) {
+    const a = b()
+}
+
+fn f(int a, float b, string c, bool d) {
+    const a = b(a,b,c,d)
+}
+
+fn f(T a) {
+    const a = b(a)
+}
+
+fn sum<T>(T a, T b):T {
+   const a = b(a,b)
+}
+fn sum<T,V,W>(T a, V b, W c):(T,V,W) {
+   const a = b(a,b,c)
+}
+
+//gen fun call
+//const a = b<int>(1,2)
+
+// tuple destructuring declaration
+var (t1, t2, t3) = (1, true, "hello")
+
+// var function declaration
+var f = fn() {
+    const a = b()
+}
+
+//call statement
+f(1,2,3)
+
+//f<int>(1,2,3)
